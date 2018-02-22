@@ -4,8 +4,7 @@ import pymongo, multiprocessing, os, threading, math
 from pymongo import MongoClient
 from threading import Thread
 from ngram import NGram
-from udicOpenData.stopwords import rmsw
-from kcm.utils.clean_and_segment import clean_and_segment
+from kcm.utils.clean_and_segmented_sentences import clean_and_segmented_sentences
 from collections import defaultdict
 
 
