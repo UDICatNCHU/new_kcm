@@ -9,7 +9,7 @@ from collections import defaultdict
 
 
 class KCM(object):
-    def __init__(self, lang='zh-TW', input_dir, uri=None):
+    def __init__(self, input_dir, lang='zh_TW', uri=None):
         self.lang = lang
         self.input_dir = input_dir
 

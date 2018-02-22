@@ -21,6 +21,6 @@ class Command(BaseCommand):
                 subprocess.call([os.join(self.baseDir, 'WikiExtractor.py'), 'zhwiki-latest-pages-articles.xml.bz2', '-o', 'wikijson', '--json'])
 
         getWikiData()
-        k = KCM(options['lang'], 'wikijson')
+        k = KCM('wikijson', options['lang'])
         k.build()
         self.stdout.write(self.style.SUCCESS('build KCM success!!!'))
