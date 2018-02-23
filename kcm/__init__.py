@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import pymongo, multiprocessing, os, threading, math
+import pymongo, multiprocessing, os, threading, math, json_lines
 from pymongo import MongoClient
 from threading import Thread
 from ngram import NGram
 from kcm.utils.clean_and_segmented_sentences import clean_and_segmented_sentences
 from collections import defaultdict
-
+from itertools import combinations
 
 class KCM(object):
     def __init__(self, input_dir, lang='zh_TW', uri=None):
@@ -23,8 +23,6 @@ class KCM(object):
         self.kcmNgram = NGram((i['key'] for i in self.Collect.find({}, {'key':1, '_id':False})))
 
     def build(self):
-        # # if self.lang == 'cht':
-        # subprocess.call(['opencc', '-i', 'wikijson/wiki.txt.all', '-o', 'wikijson/wiki.txt.all.{}'.format(self.lang)])
         def cut_cal_and_insert(filepaths):
             table = defaultdict(dict)
             for filepath in filepaths:
@@ -33,12 +31,12 @@ class KCM(object):
                         sentences = clean_and_segmented_sentences(self.lang, article)
                         for sentence in sentences:
                             for word1, word2 in combinations(sentence, 2):
-                                table[wor1][word2] = table[word1].setdefault(word2) + 1
-                                table[wor2][word1] = table[word2].setdefault(word1) + 1
+                                table[word1][word2] = table[word1].setdefault(word2, 0) + 1
+                                table[word2][word1] = table[word2].setdefault(word1, 0) + 1
             self.threadLock.acquire()
             for key, keydict in table.items():
                 for keyOfkeydict, valueOfkeydict in keydict.items():
-                    self[key][keyOfkeydict] = self.result[key].setdefault(keyOfkeydict, 0) + valueOfkeydict
+                    self.result[key][keyOfkeydict] = self.result[key].setdefault(keyOfkeydict, 0) + valueOfkeydict
             self.threadLock.release()
                         
         filepathList = [os.path.join(dir_path, file_name) for (dir_path, dir_names, file_names) in os.walk('wikijson') for file_name in file_names]
@@ -57,7 +55,7 @@ class KCM(object):
             {
                 'key':key,
                 'value':sorted(value.items(), key=lambda x:-x[1])
-            } for key, value in table.items()
+            } for key, value in self.result.items()
         ))
         self.Collect.create_index([("key", pymongo.HASHED)])
 
