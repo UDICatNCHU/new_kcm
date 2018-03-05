@@ -139,9 +139,23 @@ class KCM(object):
 			result['value'] = result['value'][:amount]		
 			return result
 		def keyFlagFind(OriginKeyword):
-			NgramKeyword = self.kcmNgram.find(OriginKeyword) if self.kcmNgram.find(OriginKeyword) else self.kcmNgram.__iter__().__next__()
+			NgramKeyword = self.kcmNgram.find(OriginKeyword) if self.kcmNgram.find(OriginKeyword) else None
 			result = {'key':NgramKeyword, 'similarity':self.kcmNgram.compare(OriginKeyword, NgramKeyword), 'PartOfSpeech':[], 'value':[]}
-			for cursor in self.KCMCollect.find({'key':NgramKeyword}, {'_id':False}):
+			useGridFS = False
+
+			cursorList = self.KCMCollect.find({'key':NgramKeyword}, {'_id':False})
+			# if Collection found, but not very sure (similarity not equal 1)
+			# then also check GridFS
+			# whether there's a complete match or not
+			# if does, use it. else, use ngram as query and return result from Collections.
+			if result['similarity'] != 1:
+				tmpCursorList = self.fs.find({"metadata.key": OriginKeyword})
+				if tmpCursorList.count():
+					result['key'], result['similarity'] = OriginKeyword, 1
+					useGridFS = True
+					cursorList = tmpCursorList
+			for cursor in cursorList:
+				if useGridFS: cursor = {**cursor.metadata, 'value':json.loads(self.fs.get(cursor._id).read().decode('utf-8'))}
 				if cursor['PartOfSpeech'] in keyFlag or not keyFlag:
 					result['value'] += cursor['value']
 					result['PartOfSpeech'].append(cursor['PartOfSpeech'])
