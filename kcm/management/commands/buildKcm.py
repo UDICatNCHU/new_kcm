@@ -19,8 +19,10 @@ class Command(BaseCommand):
 			if not os.path.isdir('wikijson'):
 				subprocess.call(['WikiExtractor.py', 'zhwiki-latest-pages-articles.xml.bz2', '-o', 'wikijson', '--json'])
 
-		# getWikiData()
+		getWikiData()
+		self.stdout.write(self.style.SUCCESS('finish the extraction of Wikipedia'))
 		k = KCM(input_dir='wikijson', lang=options['lang'], uri=uri)
-		# k.build()
+		k.build()
+		self.stdout.write(self.style.SUCCESS('finish build material of KCM'))
 		k.merge()
 		self.stdout.write(self.style.SUCCESS('build KCM success!!!'))

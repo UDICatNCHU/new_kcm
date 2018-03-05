@@ -13,18 +13,18 @@ logging.basicConfig(format='%(levelname)s : %(asctime)s : %(message)s', filename
 
 
 class KCM(object):
-	def __init__(self, input_dir, lang='zh_TW', uri=None):
+	def __init__(self, lang='zh_TW', uri=None):
 
 		self.lang = lang
-		self.input_dir = input_dir
 		self.uri = uri
 		self.db = MongoClient(self.uri).nlp
 		self.Collect = self.db['kcm_{}'.format(self.lang)]
-		self.KCMCollect = self.db['kcm_real']
+		self.KCMCollect = self.db['kcm']
 		self.fs = gridfs.GridFS(self.db) 
 		self.cpus = mp.cpu_count()
-		# ngram search
-		# self.kcmNgram = NGram((i['key'] for i in self.KCMCollect.find({}, {'key':1, '_id':False})))
+
+		# use ngram for searching
+		self.kcmNgram = NGram((i['key'] for i in self.KCMCollect.find({}, {'key':1, '_id':False})))
 
 	def build(self):
 
@@ -87,7 +87,7 @@ class KCM(object):
 			Collect = db['kcm_{}'.format(self.lang)]
 			fs = gridfs.GridFS(db)
 
-			KCMCollect = MongoClient(self.uri).nlp.kcm_real
+			KCMCollect = MongoClient(self.uri).nlp.kcm
 			result = defaultdict(dict)
 
 			while wordSubset:
@@ -132,16 +132,18 @@ class KCM(object):
 		self.KCMCollect.create_index([("key", pymongo.HASHED)])
 		logging.info('finish merging kcm')
 
-	def get(self, keyword, amount):
-		# GridFS query example
-		# json.loads(fs.find_one({"filename": "david"}).read().decode('utf-8'))
-
-		result = self.KCMCollect.find({'key':keyword}, {'_id':False}).limit(1)
-		if result.count():
-			return {**(result[0]), 'similarity':1}
-		else:
-			ngramKeyword = self.kcmNgram.find(keyword)
-			if ngramKeyword:
-				result = self.KCMCollect.find({'key':ngramKeyword}, {'_id':False}).limit(1)
-				return {'key':ngramKeyword, 'value':result[0]['value'][:amount], 'similarity':self.kcmNgram.compare(keyword, ngramKeyword)}
-			return {'key':ngramKeyword, 'value':[], 'similarity':0}
+	def get(self, keyword, amount=10, keyFlag=[], valueFlag=[]):
+		def valueFlagFind(result):
+			result['value'] = [i for i in result['value'] if i[1] in valueFlag or valueFlag == []]
+			result['value'].sort(key=lambda x:x[2], reverse=True)
+			result['value'] = result['value'][:amount]		
+			return result
+		def keyFlagFind(OriginKeyword):
+			NgramKeyword = self.kcmNgram.find(OriginKeyword) if self.kcmNgram.find(OriginKeyword) else self.kcmNgram.__iter__().__next__()
+			result = {'key':NgramKeyword, 'similarity':self.kcmNgram.compare(OriginKeyword, NgramKeyword), 'PartOfSpeech':[], 'value':[]}
+			for cursor in self.KCMCollect.find({'key':NgramKeyword}, {'_id':False}):
+				if cursor['PartOfSpeech'] in keyFlag or not keyFlag:
+					result['value'] += cursor['value']
+					result['PartOfSpeech'].append(cursor['PartOfSpeech'])
+			return result
+		return valueFlagFind(keyFlagFind(keyword))
