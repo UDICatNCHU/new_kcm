@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url
-from kcmApp import views
+from kcm import views
 
 urlpatterns = [
     url(r'^$', views.kcm, name='kcm'), 

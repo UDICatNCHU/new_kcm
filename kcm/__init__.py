@@ -13,8 +13,8 @@ logging.basicConfig(format='%(levelname)s : %(asctime)s : %(message)s', filename
 
 
 class KCM(object):
-	def __init__(self, lang='zh_TW', uri=None):
-
+	def __init__(self, input_dir='wikijson', lang='zh_TW', uri=None):
+		self.input_dir = input_dir
 		self.lang = lang
 		self.uri = uri
 		self.db = MongoClient(self.uri).nlp
@@ -60,7 +60,7 @@ class KCM(object):
 				Collect.insert(({'key':key, 'value':keyDict} for key, keyDict in table.items()))
 
 		self.Collect.remove({})
-		filepathList = [os.path.join(dir_path, file_name) for (dir_path, dir_names, file_names) in os.walk('wikijson') for file_name in file_names]
+		filepathList = [os.path.join(dir_path, file_name) for (dir_path, dir_names, file_names) in os.walk(self.input_dir) for file_name in file_names]
 		amount = math.ceil(len(filepathList)/self.cpus)
 		filepathList = [filepathList[i:i + amount] for i in range(0, len(filepathList), amount)]
 		processes = [mp.Process(target=cut_cal_and_insert, kwargs={'filepaths':filepathList[i]}) for i in range(self.cpus)]
@@ -130,6 +130,10 @@ class KCM(object):
 			process.join()
 										
 		self.KCMCollect.create_index([("key", pymongo.HASHED)])
+		
+		# List the names of all files stored in this instance of GridFS.
+        # An index on {filename: 1, uploadDate: -1} will automatically be created when this method is called the first time.
+		self.fs.list()
 		logging.info('finish merging kcm')
 
 	def get(self, keyword, amount=10, keyFlag=[], valueFlag=[]):

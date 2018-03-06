@@ -22,3 +22,8 @@ class APITestCase(TestCase):
 		del a['similarity']
 		del b['similarity']
 		assert a == b and a != None
+
+	def test_GridFS(self):
+		assert type(kcmObject.get('曾經', 10)) == dict
+
+		
