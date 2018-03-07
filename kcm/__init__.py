@@ -27,7 +27,6 @@ class KCM(object):
 		self.kcmNgram = NGram((i['key'] for i in self.KCMCollect.find({}, {'key':1, '_id':False})))
 
 	def build(self):
-
 		# graceful_auto_reconnect is used to handle Mongo Connection issue.
 		# when Mongo is too busy, it somehow frozen and restart mongod.service
 		# which will cause connection issue
@@ -116,7 +115,7 @@ class KCM(object):
 							# So if document exceeds this limit
 							# use GridFS to store it.
 							if asizeof(payload) >= 16777216:
-								fs.put(json.dumps(payload['value']), metadata={'key':payload['key'], 'PartOfSpeech':payload['PartOfSpeech']}, encoding='utf-8')
+								fs.put(json.dumps(payload['value']), filename=payload['key'], contentType=payload['PartOfSpeech'], encoding='utf-8')
 							else:
 								yield payload
 
@@ -132,7 +131,7 @@ class KCM(object):
 		self.KCMCollect.create_index([("key", pymongo.HASHED)])
 		
 		# List the names of all files stored in this instance of GridFS.
-        # An index on {filename: 1, uploadDate: -1} will automatically be created when this method is called the first time.
+		# An index on {filename: 1, uploadDate: -1} will automatically be created when this method is called the first time.
 		self.fs.list()
 		logging.info('finish merging kcm')
 
@@ -153,13 +152,13 @@ class KCM(object):
 			# whether there's a complete match or not
 			# if does, use it. else, use ngram as query and return result from Collections.
 			if result['similarity'] != 1:
-				tmpCursorList = self.fs.find({"metadata.key": OriginKeyword})
+				tmpCursorList = self.fs.find({"filename": OriginKeyword})
 				if tmpCursorList.count():
 					result['key'], result['similarity'] = OriginKeyword, 1
 					useGridFS = True
 					cursorList = tmpCursorList
 			for cursor in cursorList:
-				if useGridFS: cursor = {**cursor.metadata, 'value':json.loads(self.fs.get(cursor._id).read().decode('utf-8'))}
+				if useGridFS: cursor = {'PartOfSpeech':cursor.contentType, 'value':json.loads(self.fs.get(cursor._id).read().decode('utf-8'))}
 				if cursor['PartOfSpeech'] in keyFlag or not keyFlag:
 					result['value'] += cursor['value']
 					result['PartOfSpeech'].append(cursor['PartOfSpeech'])
