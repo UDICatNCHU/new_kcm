@@ -22,6 +22,7 @@ class KCM(object):
 		self.KCMCollect = self.db['kcm']
 		self.fs = gridfs.GridFS(self.db) 
 		self.cpus = mp.cpu_count()
+		self.mergeCpus = 3
 
 		# use ngram for searching
 		self.kcmNgram = NGram((i['key'] for i in self.KCMCollect.find({}, {'key':1, '_id':False})))
@@ -74,8 +75,7 @@ class KCM(object):
 	def merge(self):
 		logging.info('start merging kcm')
 		wordSet = list({keywordDict['key'] for keywordDict in self.Collect.find({}, {'_id':False})}) 
-		mergeCpus = 3
-		amount = math.ceil(len(wordSet)/mergeCpus)
+		amount = math.ceil(len(wordSet)/self.mergeCpus)
 		wordSet = [wordSet[i:i + amount] for i in range(0, len(wordSet), amount)]
 
 		@graceful_auto_reconnect
@@ -122,7 +122,7 @@ class KCM(object):
 					KCMCollect.insert(Document_Generator())
 					result = defaultdict(dict)
 
-		processes = [mp.Process(target=mergeKCMDict, kwargs={'wordSubset':wordSet[i]}) for i in range(mergeCpus)]
+		processes = [mp.Process(target=mergeKCMDict, kwargs={'wordSubset':wordSet[i]}) for i in range(self.mergeCpus)]
 		for process in processes:
 			process.start()
 		for process in processes:
