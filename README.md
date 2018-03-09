@@ -55,27 +55,50 @@ Need to execute these commands before query the APIS.
 
 ## API
 
-1. the result of querying KCM model with keyword `美國隊長`(Captain America)：`/kcm`_
+1. the result of querying KCM model with keyword `周杰倫`(Captain America)：`/kcm`_
   - keyword
   - num (default=10)
   - keyFlag (default=[])
   - valueFlag (defualt=[])
-  - example：[http://140.120.13.244:10000/kem?keyword=美國隊長&num=100](http://140.120.13.244:10000/kem?keyword=美國隊長&num=100)
+  - example1：[http://140.120.13.244/kcm?keyword=周杰倫](http://140.120.13.244/kcm?keyword=周杰倫)
 
-  ```
-  [
-    ["電影",93],
-    ["復仇者",78],
-    ["戰士",55],
-    ["英雄",55],
-    ["鋼鐵",52],
-    ["內戰",50],
-    ["復仇者聯盟",44],
-    ["漫畫",42],
-    ["酷寒",39],
-    ["巴基",36]
-  ]
-  ```
+      ```
+      {
+        "PartOfSpeech": ["nr"],
+        "similarity": 1.0,
+        "key": "周杰倫",
+        "value": [
+          ["巡迴演唱", "l", 861],
+          ["世界", "n", 705],
+          ["周杰倫", "nr", 424],
+          ["專輯", "n", 286],
+          ["歌曲", "n", 241],
+          ["時間", "n", 234]
+        ]
+      }
+      ```
+
+  - example2 (with specific keyFlag and valueFlag)：[http://140.120.13.244/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr](http://140.120.13.244/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr)
+
+      ```
+      {
+        "PartOfSpeech": ["nr"],
+        "similarity": 1.0,
+        "key": "周杰倫",
+        "value": [
+          ["世界", "n", 705],
+          ["周杰倫", "nr", 424],
+          ["專輯", "n", 286],
+          ["歌曲", "n", 241],
+          ["時間", "n", 234],
+          ["深圳站", "n", 146],
+          ["演唱會", "n", 139],
+          ["成都站", "n", 132],
+          ["電影", "n", 119],
+          ["蔡依林", "nr", 111]
+        ]
+      }
+      ```
 
 ## Break down into end to end tests
 
