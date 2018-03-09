@@ -60,7 +60,7 @@ Need to execute these commands before query the APIS.
   - num (default=10)
   - keyFlag (default=[])
   - valueFlag (defualt=[])
-  - example1：[http://140.120.13.244/kcm?keyword=周杰倫](http://140.120.13.244/kcm?keyword=周杰倫)
+  - example1：[http://udiclab.cs.nchu.edu.tw/kcm?keyword=周杰倫](http://udiclab.cs.nchu.edu.tw/kcm?keyword=周杰倫)
 
       ```
       {
@@ -78,7 +78,7 @@ Need to execute these commands before query the APIS.
       }
       ```
 
-  - example2 (with specific keyFlag and valueFlag)：[http://140.120.13.244/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr](http://140.120.13.244/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr)
+  - example2 (with specific keyFlag and valueFlag)：[http://udiclab.cs.nchu.edu.tw/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr](http://udiclab.cs.nchu.edu.tw/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr)
 
       ```
       {
