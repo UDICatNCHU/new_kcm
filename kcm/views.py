@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from djangoApiDec.djangoApiDec import queryString_required
 from kcm import KCM
 from udic_nlp_API.settings_database import uri
-kcmObject = KCM(input_dir='wikijson', lang='zh_TW', uri=uri)
+kcmObject = KCM(lang='zh', uri=uri)
 
 @queryString_required(['keyword'])
 def kcm(request):

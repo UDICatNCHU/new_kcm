@@ -13,10 +13,12 @@ class Command(BaseCommand):
 	
 	def handle(self, *args, **options):
 		def getWikiData():
-			subprocess.call(['mkdir', 'build'])
-			subprocess.call(['wget', 'https://dumps.wikimedia.org/zhwiki/latest/zhwiki-latest-pages-articles.xml.bz2'])
-
-			if not os.path.isdir('wikijson'):
+			subprocess.call(['mkdir', 'Wikipedia'])
+			subprocess.call(['mkdir', 'wikijson'])
+			lang = options['lang']
+			url = 'https://dumps.wikimedia.org/{}wiki/latest/{}wiki-latest-pages-articles.xml.bz2'.format(lang, lang)
+			if not os.path.exists('{}wiki-latest-pages-articles.xml.bz2'.format(lang)):
+				subprocess.call(['wget', url,'-P', 'Wikipedia'])
 				subprocess.call(['WikiExtractor.py', 'zhwiki-latest-pages-articles.xml.bz2', '-o', 'wikijson', '--json'])
 
 		getWikiData()

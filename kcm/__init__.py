@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import pymongo, os, math, json_lines, psutil, logging, sys, json, gridfs
+import pymongo, os, math, json_lines, logging, sys, json, gridfs
 import multiprocessing as mp
 from pymongo import MongoClient
 from ngram import NGram
@@ -8,12 +8,12 @@ from kcm.utils.clean_and_segmented_sentences import clean_and_segmented_sentence
 from kcm.utils.graceful_auto_reconnect import graceful_auto_reconnect
 from pympler.asizeof import asizeof
 from collections import defaultdict
-from itertools import combinations
+from itertools import combinations, chain
 logging.basicConfig(format='%(levelname)s : %(asctime)s : %(message)s', filename='buildKCM.log', level=logging.INFO)
 
 
 class KCM(object):
-	def __init__(self, input_dir='wikijson', lang='zh_TW', uri=None):
+	def __init__(self, input_dir='wikijson', lang='zh', uri=None):
 		self.input_dir = input_dir
 		self.lang = lang
 		self.uri = uri
@@ -47,16 +47,22 @@ class KCM(object):
 					for article in json_lines.reader(f):
 						sentences = clean_and_segmented_sentences(self.lang, article)
 						for sentence in sentences:
-							for word1_and_partofspeech, word2_and_partofspeech in combinations(sentence, 2):
+							sentence = list(sentence)
+							if len(sentence) <= 1: continue
+							start, end = [(('<start>', 'xx'), sentence[0])], [(sentence[-1], ('xx', '<end>'))]
+							combinations_with_startAndEnd = chain(start, combinations(sentence, 2), end)
+
+							for word_couple in combinations_with_startAndEnd:
+								# word_couple is supposed to be two word_and_partofspeech, but it somehow has null in it...
 								# word_and_partofspeech's type is List
 								# [word, part of speech]
 								# But Mongo cannot use tuple or List as key
-								# so i just concatenate it with @@@@@ for the sake of convineint
+								# so i just concatenate it with <cut> for the sake of convineint
 								# and split it after the insertion.
-								word1_and_partofspeech, word2_and_partofspeech = '@@@@@'.join(word1_and_partofspeech), '@@@@@'.join(word2_and_partofspeech)
+								word1_and_partofspeech, word2_and_partofspeech = word_couple
+								word1_and_partofspeech, word2_and_partofspeech = '<cut>'.join(word1_and_partofspeech), '<cut>'.join(word2_and_partofspeech)
 								table[word1_and_partofspeech][word2_and_partofspeech] = table[word1_and_partofspeech].setdefault(word2_and_partofspeech, 0) + 1
 								table[word2_and_partofspeech][word1_and_partofspeech] = table[word2_and_partofspeech].setdefault(word1_and_partofspeech, 0) + 1
-
 				Collect.insert(({'key':key, 'value':keyDict} for key, keyDict in table.items()))
 
 		self.Collect.remove({})
@@ -77,6 +83,7 @@ class KCM(object):
 		wordSet = list({keywordDict['key'] for keywordDict in self.Collect.find({}, {'_id':False})}) 
 		amount = math.ceil(len(wordSet)/self.mergeCpus)
 		wordSet = [wordSet[i:i + amount] for i in range(0, len(wordSet), amount)]
+		self.KCMCollect.remove({})
 
 		@graceful_auto_reconnect
 		def mergeKCMDict(wordSubset):
@@ -99,7 +106,7 @@ class KCM(object):
 				# Dict will take much mem space than List
 				# so use list comprehension to do transformation.
 				result[key] = [
-					key_and_partOfSpeech.split('@@@@@')+[count] 
+					key_and_partOfSpeech.split('<cut>')+[count] 
 					for key_and_partOfSpeech, count in sorted(result[key].items(), key=lambda x:-x[1])
 				]
 
@@ -107,8 +114,8 @@ class KCM(object):
 					def Document_Generator():
 						for key, value in result.items():
 							payload = {
-								'key':key.split('@@@@@')[0],
-								'PartOfSpeech':key.split('@@@@@')[1],
+								'key':key.split('<cut>')[0],
+								'PartOfSpeech':key.split('<cut>')[1],
 								'value':value
 							}
 							# The maximum BSON document size is 16 megabytes.
@@ -127,7 +134,6 @@ class KCM(object):
 			process.start()
 		for process in processes:
 			process.join()
-										
 		self.KCMCollect.create_index([("key", pymongo.HASHED)])
 		
 		# List the names of all files stored in this instance of GridFS.
