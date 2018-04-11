@@ -65,7 +65,11 @@ class KCM(object):
 								table[word2_and_partofspeech][word1_and_partofspeech] = table[word2_and_partofspeech].setdefault(word1_and_partofspeech, 0) + 1
 				Collect.insert(({'key':key, 'value':keyDict} for key, keyDict in table.items()))
 
+		# empty first
 		self.Collect.remove({})
+		self.db.drop_collection('fs.chunks')
+		self.db.drop_collection('fs.files')
+		
 		filepathList = [os.path.join(dir_path, file_name) for (dir_path, dir_names, file_names) in os.walk(self.input_dir) for file_name in file_names]
 		amount = math.ceil(len(filepathList)/self.cpus)
 		filepathList = [filepathList[i:i + amount] for i in range(0, len(filepathList), amount)]
