@@ -12,18 +12,21 @@ class Command(BaseCommand):
 		parser.add_argument('--lang', type=str)
 	
 	def handle(self, *args, **options):
+		wiki_dir_name = 'Wikipedia'
+		wiki_json_dir = 'wikijson'
+		
 		def getWikiData():
-			subprocess.call(['mkdir', 'Wikipedia'])
-			subprocess.call(['mkdir', 'wikijson'])
+			subprocess.call(['mkdir', wiki_dir_name])
+			subprocess.call(['mkdir', wiki_json_dir])
 			lang = options['lang']
 			url = 'https://dumps.wikimedia.org/{}wiki/latest/{}wiki-latest-pages-articles.xml.bz2'.format(lang, lang)
-			if not os.path.exists('{}wiki-latest-pages-articles.xml.bz2'.format(lang)):
-				subprocess.call(['wget', url,'-P', 'Wikipedia'])
-				subprocess.call(['WikiExtractor.py', 'zhwiki-latest-pages-articles.xml.bz2', '-o', 'wikijson', '--json'])
+			if not os.path.exists(os.path.join(wiki_dir_name, '{}wiki-latest-pages-articles.xml.bz2'.format(lang))):
+				subprocess.call(['wget', url,'-P', wiki_dir_name])
+				subprocess.call(['WikiExtractor.py', os.path.join(wiki_dir_name, '{}wiki-latest-pages-articles.xml.bz2'.format(lang)), '-o', wiki_json_dir, '--json'])
 
 		getWikiData()
 		self.stdout.write(self.style.SUCCESS('finish the extraction of Wikipedia'))
-		k = KCM(input_dir='wikijson', lang=options['lang'], uri=uri)
+		k = KCM(input_dir=wiki_json_dir, lang=options['lang'], uri=uri)
 		k.build()
 		self.stdout.write(self.style.SUCCESS('finish build material of KCM'))
 		k.merge()
