@@ -51,7 +51,7 @@ Now three languages are available：
 
 Need to execute these commands before query the APIS.
 
-1. Build KCM: `python3 manage.py buildKcm --lang=zh_TW`
+1. Build KCM: `python3 manage.py buildKcm --lang=zh`
 
 ## API
 
