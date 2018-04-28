@@ -143,6 +143,11 @@ class KCM(object):
 		# List the names of all files stored in this instance of GridFS.
 		# An index on {filename: 1, uploadDate: -1} will automatically be created when this method is called the first time.
 		self.fs.list()
+
+		# KCMCollect is our final collections
+		# Collect is just a intermediate collections
+		# so drop it after finishing merge.
+		self.Collect.drop()
 		logging.info('finish merging kcm')
 
 	def get(self, keyword, amount=10, keyFlag=[], valueFlag=[]):
