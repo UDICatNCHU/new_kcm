@@ -12,10 +12,10 @@ class Command(BaseCommand):
 		parser.add_argument('--lang', type=str)
 	
 	def handle(self, *args, **options):
-		wiki_dir_name = 'Wikipedia'
-		wiki_json_dir = 'wikijson'
-		
 		def getWikiData():
+			wiki_dir_name = 'Wikipedia'
+			wiki_json_dir = 'wikijson'
+
 			subprocess.call(['mkdir', wiki_dir_name])
 			subprocess.call(['mkdir', wiki_json_dir])
 			lang = options['lang']
@@ -23,8 +23,9 @@ class Command(BaseCommand):
 			if not os.path.exists(os.path.join(wiki_dir_name, '{}wiki-latest-pages-articles.xml.bz2'.format(lang))):
 				subprocess.call(['wget', url,'-P', wiki_dir_name])
 				subprocess.call(['WikiExtractor.py', os.path.join(wiki_dir_name, '{}wiki-latest-pages-articles.xml.bz2'.format(lang)), '-o', wiki_json_dir, '--json'])
+			return wiki_dir_name, wiki_json_dir, lang
 
-		getWikiData()
+		wiki_dir_name, wiki_json_dir, lang = getWikiData()
 		self.stdout.write(self.style.SUCCESS('finish the extraction of Wikipedia'))
 		k = KCM(input_dir=wiki_json_dir, lang=options['lang'], uri=uri)
 		k.build()
