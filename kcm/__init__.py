@@ -17,11 +17,13 @@ class KCM(object):
 		self.input_dir = input_dir
 		self.lang = lang
 		self.uri = uri
-		self.db = MongoClient(self.uri).nlp
-		self.Collect = self.db['kcm_{}'.format(self.lang)]
+		self.db = MongoClient(self.uri)['nlp_{}'.format(self.lang)]
+		self.Collect = self.db['kcm_intermediate']
 		self.KCMCollect = self.db['kcm']
-		self.fs = gridfs.GridFS(self.db) 
-		self.cpus = mp.cpu_count()
+		self.fs = gridfs.GridFS(self.db)
+
+		# prevent it from taking up all the cpus and make MongoDB dead.
+		self.cpus = mp.cpu_count() - 2
 		self.mergeCpus = 3
 
 		# use ngram for searching
@@ -36,7 +38,7 @@ class KCM(object):
 		def cut_cal_and_insert(filepaths):
 			# Each process need independent Mongo Client
 			# or it may raise Deadlock in Mongo.
-			Collect = MongoClient(self.uri).nlp['kcm_{}'.format(self.lang)]
+			Collect = MongoClient(self.uri)['nlp_{}'.format(self.lang)]['kcm_intermediate']
 
 			for index, filepath in enumerate(filepaths):
 				if index%10 == 0:
@@ -66,9 +68,11 @@ class KCM(object):
 				Collect.insert(({'key':key, 'value':keyDict} for key, keyDict in table.items()))
 
 		# empty first
+		self.KCMCollect.remove({})
 		self.Collect.remove({})
 		self.db.drop_collection('fs.chunks')
 		self.db.drop_collection('fs.files')
+		logging.info('finishing emtpy Collection and fileSystem')
 		
 		filepathList = [os.path.join(dir_path, file_name) for (dir_path, dir_names, file_names) in os.walk(self.input_dir) for file_name in file_names]
 		amount = math.ceil(len(filepathList)/self.cpus)
@@ -87,17 +91,16 @@ class KCM(object):
 		wordSet = list({keywordDict['key'] for keywordDict in self.Collect.find({}, {'_id':False})}) 
 		amount = math.ceil(len(wordSet)/self.mergeCpus)
 		wordSet = [wordSet[i:i + amount] for i in range(0, len(wordSet), amount)]
-		self.KCMCollect.remove({})
 
 		@graceful_auto_reconnect
 		def mergeKCMDict(wordSubset):
 			# Each process need independent Mongo Client
 			# or it may raise Deadlock in Mongo.
-			db = MongoClient(self.uri).nlp
-			Collect = db['kcm_{}'.format(self.lang)]
+			db = MongoClient(self.uri)['nlp_{}'.format(self.lang)]
+			Collect = db['kcm_intermediate']
+			KCMCollect = db['kcm']
 			fs = gridfs.GridFS(db)
 
-			KCMCollect = MongoClient(self.uri).nlp.kcm
 			result = defaultdict(dict)
 
 			while wordSubset:
