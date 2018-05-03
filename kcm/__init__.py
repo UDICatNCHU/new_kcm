@@ -51,7 +51,7 @@ class KCM(object):
 						for sentence in sentences:
 							sentence = list(sentence)
 							if len(sentence) <= 1: continue
-							start, end = [(('<start>', 'xx'), sentence[0])], [(sentence[-1], ('xx', '<end>'))]
+							start, end = [(('<start>', 'xx'), sentence[0])], [(sentence[-1], ('<end>', 'xx'))]
 							combinations_with_startAndEnd = chain(start, combinations(sentence, 2), end)
 
 							for word_couple in combinations_with_startAndEnd:
@@ -75,6 +75,13 @@ class KCM(object):
 		logging.info('finishing emtpy Collection and fileSystem')
 		
 		filepathList = [os.path.join(dir_path, file_name) for (dir_path, dir_names, file_names) in os.walk(self.input_dir) for file_name in file_names]
+
+		# If self.cpus > len(filepathList)
+		# then amount would be zero
+		# which would occurs IndexError: list index out of range
+		# from filepathList array.
+		if len(filepathList) < self.cpus:
+			self.cpus = len(filepathList)
 		amount = math.ceil(len(filepathList)/self.cpus)
 		filepathList = [filepathList[i:i + amount] for i in range(0, len(filepathList), amount)]
 		processes = [mp.Process(target=cut_cal_and_insert, kwargs={'filepaths':filepathList[i]}) for i in range(self.cpus)]
@@ -117,6 +124,8 @@ class KCM(object):
 					for key_and_partOfSpeech, count in sorted(result[key].items(), key=lambda x:-x[1])
 				]
 
+				# It would take up too much RAM if we merge all Document into one list and insert once
+				# so we wait till list contains 5000 words and then flush them into MongoDB
 				if len(result) >= 5000:
 					def Document_Generator():
 						for key, value in result.items():
@@ -135,6 +144,10 @@ class KCM(object):
 
 					KCMCollect.insert(Document_Generator())
 					result = defaultdict(dict)
+
+			# We have a 5000 insert threshold up there.
+			# so please remember to insert the rest of the list which is less than 5000
+			KCMCollect.insert(Document_Generator())
 
 		processes = [mp.Process(target=mergeKCMDict, kwargs={'wordSubset':wordSet[i]}) for i in range(self.mergeCpus)]
 		for process in processes:
