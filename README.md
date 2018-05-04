@@ -13,7 +13,6 @@ Now three languages are available：
 ### Prerequisities
 
 * If you want to use `the English version of KCM`， please download nltk data：`python3 -m nltk.downloader -d /usr/local/share/nltk_data all`
-* To build KCM using other data sources, please take a look at [KCM Data Source Extractor](https://github.com/UDICatNCHU/KCM-Data-Source-Extractor)
 
 ## Installing
 
