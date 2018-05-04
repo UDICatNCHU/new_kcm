@@ -14,10 +14,14 @@ Now three languages are available：
 
 * If you want to use `the English version of KCM`， please download nltk data：`python3 -m nltk.downloader -d /usr/local/share/nltk_data all`
 
-## Installing
+## Install
 
-1. (Recommended): Use [docker-compose](https://github.com/udicatnchu/udic-nlp-api) to install
-2. Or install manually, and setup config listed below: `pip install kcm`
+* (Recommended): Use [docker-compose](https://github.com/udicatnchu/udic-nlp-api) to install
+
+## Manually Install
+
+* You can also install kcm manually, and setup config listed below: `pip install kcm`
+* If you want to integrate `kcm` into your own django project, use manually install.
 
 ### Config
 
@@ -47,11 +51,9 @@ Now three languages are available：
 
 3. fire `python manage.py runserver` and go `127.0.0.1:8000/` to check whether the config is all ok.
 
-## Commands
+### Building the model  
 
-Need to execute these commands before query the APIS.
-
-1. Build KCM: `python3 manage.py buildKcm --lang zh`
+command: `python3 manage.py buildKcm --lang <lang, e.g., zh or en or th> `
 
 ## API
 
