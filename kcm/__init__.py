@@ -42,7 +42,7 @@ class KCM(object):
 
 			for index, filepath in enumerate(filepaths):
 				if index%10 == 0:
-					logging.info("已處理 %d 個檔案" % index)
+					logging.info("already processed %d files" % index)
 				table = defaultdict(dict)
 
 				with open(filepath, 'r') as f:
@@ -177,13 +177,13 @@ class KCM(object):
 			result = {'key':NgramKeyword, 'similarity':self.kcmNgram.compare(OriginKeyword, NgramKeyword), 'PartOfSpeech':[], 'value':[]}
 			useGridFS = False
 
-			cursorList = self.KCMCollect.find({'key':NgramKeyword}, {'_id':False})
+			cursorList = self.KCMCollect.find({'key':NgramKeyword}, {'_id':False}).limit(1)
 			# if Collection found, but not very sure (similarity not equal 1)
 			# then also check GridFS
 			# whether there's a complete match or not
 			# if does, use it. else, use ngram as query and return result from Collections.
 			if result['similarity'] != 1:
-				tmpCursorList = self.fs.find({"filename": OriginKeyword})
+				tmpCursorList = self.fs.find({"filename": OriginKeyword}).limit(1)
 				if tmpCursorList.count():
 					result['key'], result['similarity'] = OriginKeyword, 1
 					useGridFS = True

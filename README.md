@@ -17,7 +17,8 @@ Now three languages are available：
 
 ## Installing
 
-`pip install kcm`
+1. (Recommended): Use [docker-compose](https://github.com/udicatnchu/udic-nlp-api) to install
+2. Or install manually, and setup config listed below: `pip install kcm`
 
 ### Config
 
@@ -51,7 +52,7 @@ Now three languages are available：
 
 Need to execute these commands before query the APIS.
 
-1. Build KCM: `python3 manage.py buildKcm --lang=zh`
+1. Build KCM: `python3 manage.py buildKcm --lang zh`
 
 ## API
 
