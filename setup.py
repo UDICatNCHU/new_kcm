@@ -4,12 +4,12 @@ setup(
     name = 'kcm',
     packages = ['kcm'],
     package_data={'kcm':['management/commands/*', 'utils/*']},
-    version = '1.0',
+    version = '1.1',
     description = 'kcm class file',
     author = 'davidtnfsh',
     author_email = 'davidtnfsh@gmail.com',
     url = 'https://github.com/udicatnchu/kcm',
-    download_url = 'https://github.com/udicatnchu/kcm/archive/v1.0.tar.gz',
+    download_url = 'https://github.com/udicatnchu/kcm/archive/v1.1.tar.gz',
     keywords = ['kcm'],
     classifiers = [],
     license='GPL3.0',
@@ -21,7 +21,8 @@ setup(
         'ngram',
         'json-lines',
         'pympler',
-        'opencc-python-reimplemented'
+        'opencc-python-reimplemented',
+        'pythainlp'
     ],
     dependency_links=[
         'git+git://github.com/attardi/wikiextractor.git@2a5e6aebc030c936c7afd0c349e6826c4d02b871',

@@ -23,8 +23,8 @@ class KCM(object):
 		self.fs = gridfs.GridFS(self.db)
 
 		# prevent it from taking up all the cpus and make MongoDB dead.
-		self.cpus = mp.cpu_count() - 2
-		self.mergeCpus = 3
+		self.cpus = math.ceil(mp.cpu_count() * 0.7)
+		self.mergeCpus = math.ceil(mp.cpu_count() * 0.1)
 
 		# use ngram for searching
 		self.kcmNgram = NGram((i['key'] for i in self.KCMCollect.find({}, {'key':1, '_id':False})))
