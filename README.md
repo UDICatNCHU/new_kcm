@@ -20,8 +20,9 @@ Now three languages are available：
 
 ## Manually Install
 
-* You can also install kcm manually, and setup config listed below: `pip install kcm`
-* If you want to integrate `kcm` into your own django project, use manually install.
+If you want to integrate `kcm` into your own django project, use manually install.
+
+* `pip install kcm`
 
 ### Config
 
@@ -49,15 +50,12 @@ Now three languages are available：
     ]
     ```
 
-3. fire `python manage.py runserver` and go `127.0.0.1:8000/` to check whether the config is all ok.
-
-### Building the model  
-
-command: `python3 manage.py buildKcm --lang <lang, e.g., zh or en or th> `
+3. use `python3 manage.py buildKcm --lang <lang, e.g., zh or en or th> ` to build model of kcm.
+4. fire `python manage.py runserver` and go `127.0.0.1:8000/` to check whether the config is all ok.
 
 ## API
 
-1. the result of querying KCM model with keyword `周杰倫`(Captain America)：`/kcm`_
+1. the result of querying KCM model with keyword `周杰倫`(Captain America)：_`/kcm`_
   - keyword
   - num (default=10)
   - keyFlag (default=[])

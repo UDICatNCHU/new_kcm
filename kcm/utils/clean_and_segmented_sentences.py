@@ -1,19 +1,3 @@
-# for zh 
-from udicOpenData.stopwords import rmsw
-from opencc import OpenCC
-from itertools import chain
-openCC = OpenCC('s2t')
-
-# for th
-import nltk 
-from nltk.corpus import stopwords 
-th_stopwords = set(stopwords.words('thai'))
-
-# for en
-###############
-# coming soon #
-###############
-
 def clean_and_segmented_sentences(lang, article):
 	""" Do segmentation and removing stopwords for a wiki page
 
@@ -34,22 +18,39 @@ def clean_and_segmented_sentences(lang, article):
 	]
 	"""
 	if lang == 'zh':
-		def peek(iterable):
-			try:
-				first = next(iterable)
-			except StopIteration:
-				return None
-			return True, chain([first], iterable)
-
-		for i in article['text'].split('。'):
-			seg = rmsw(openCC.convert(i), flag=True)
-			seg = peek(seg)
-			if seg is None:
-				continue
-			else:
-				boolean, seg = seg
-				yield seg
+		return zh(article)
+	elif lang == 'th':
+		return th(article)
 	elif lang == 'en':
 		pass
-	elif lang == 'th':
-		pass
+
+def zh(article):
+	# for zh 
+	from udicOpenData.stopwords import rmsw
+	from opencc import OpenCC
+	from itertools import chain
+	openCC = OpenCC('s2t')
+
+	def peek(iterable):
+		try:
+			first = next(iterable)
+		except StopIteration:
+			return None
+		return True, chain([first], iterable)
+
+	for i in article['text'].split('。'):
+		seg = rmsw(openCC.convert(i), flag=True)
+		seg = peek(seg)
+		if seg is None:
+			continue
+		else:
+			boolean, seg = seg
+			yield seg
+
+def th(article):
+	# for th
+	import nltk 
+	from nltk.corpus import stopwords 
+	# th_stopwords = set(stopwords.words('thai'))
+	from pythainlp.tokenize import word_tokenize
+	return

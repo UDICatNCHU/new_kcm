@@ -13,12 +13,12 @@ class Command(BaseCommand):
 	
 	def handle(self, *args, **options):
 		def getWikiData():
-			wiki_dir_name = 'Wikipedia'
-			wiki_json_dir = 'wikijson'
+			lang = options['lang']
+			wiki_dir_name = 'Wikipedia_{}'.format(lang)
+			wiki_json_dir = 'wikijson_{}'.format(lang)
 
 			subprocess.call(['mkdir', wiki_dir_name])
 			subprocess.call(['mkdir', wiki_json_dir])
-			lang = options['lang']
 			url = 'https://dumps.wikimedia.org/{}wiki/latest/{}wiki-latest-pages-articles.xml.bz2'.format(lang, lang)
 			if not os.path.exists(os.path.join(wiki_dir_name, '{}wiki-latest-pages-articles.xml.bz2'.format(lang))):
 				subprocess.call(['wget', url,'-P', wiki_dir_name])
