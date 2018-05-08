@@ -1,3 +1,9 @@
+# ja
+# MeCab has some bug
+# so i cannot put these import statement into ja function scope ...
+import MeCab
+mecab = MeCab.Tagger("-Ochasen")
+
 def clean_and_segmented_sentences(lang, article):
 	""" Do segmentation and removing stopwords for a wiki page
 
@@ -23,6 +29,8 @@ def clean_and_segmented_sentences(lang, article):
 		return th(article)
 	elif lang == 'en':
 		pass
+	elif lang == 'ja':
+		return ja(article)
 
 def zh(article):
 	# for zh 
@@ -54,3 +62,9 @@ def th(article):
 	# th_stopwords = set(stopwords.words('thai'))
 	from pythainlp.tokenize import word_tokenize
 	return
+
+def ja(article):
+	for line in article.split('。'):
+		line = line.strip()
+		if line:
+			yield (i.split('\t')[0] for i in mecab.parse(line).split('\n')[:-2])
