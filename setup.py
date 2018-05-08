@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name = 'kcm',
     packages = ['kcm'],
-    package_data={'kcm':['management/commands/*', 'utils/*']},
+    package_data={'kcm':['management/commands/*', 'utils/*', 'utils/dictionary/*']},
     version = '1.3',
     description = 'kcm class file',
     author = 'davidtnfsh',

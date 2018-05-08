@@ -11,3 +11,4 @@ kcm/views.py
 kcm/management/commands/buildKcm.py
 kcm/utils/clean_and_segmented_sentences.py
 kcm/utils/graceful_auto_reconnect.py
+kcm/utils/dictionary/th.txt
