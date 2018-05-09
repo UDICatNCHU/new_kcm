@@ -70,9 +70,12 @@ def th(article):
 	thstopwords = stopwords.words('thai') + ['\n']# a list of Thai stopwords
 	thstopwords = list(set(thstopwords + [i.strip() for i in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stopwords/th.txt'), 'r', encoding='UTF-8')]))
 	for line in article['text'].split(' '): 
-		line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords]
-		POSlist = pos_tag(line,engine='old')
-		yield POSlist
+		if line:
+			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords]
+			if not line: 
+				continue
+			POSlist = pos_tag(line,engine='old')
+			yield POSlist
 
 def ja(article):
 	for line in article['text'].split('。'):
