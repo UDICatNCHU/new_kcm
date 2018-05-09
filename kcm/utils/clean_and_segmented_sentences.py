@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+import os
 # ja
 # MeCab has some bug
 # so i cannot put these import statement into ja function scope ...
@@ -65,8 +67,8 @@ def th(article):
 	from pythainlp.corpus import stopwords
 	from pythainlp.tokenize import word_tokenize
 	from pythainlp.tag import pos_tag
-	thstopwords = stopwords.words('thai') # a list of Thai stopwords
-	# TO-DO
+	thstopwords = stopwords.words('thai') + ['\n']# a list of Thai stopwords
+	thstopwords = list(set(thstopwords + [i.strip() for i in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stopwords/th.txt'), 'r', encoding='UTF-8')]))
 	for line in article['text'].split(' '): 
 		line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords]
 		POSlist = pos_tag(line,engine='old')
