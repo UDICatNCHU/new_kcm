@@ -65,9 +65,28 @@ def th(article):
 	from pythainlp.tokenize import word_tokenize
 	from pythainlp.tag import pos_tag
 	thstopwords = stopwords.words('thai') # a list of Thai stopwords
-	test = word_tokenize('วันนี้อากาศดี',engine='newmm')        # text = 'Today has a good weather' return type as list ['วันนี้', 'อากาศ', 'ดี']
-	POSlist = pos_tag(test,engine='old')			# pos_tag function input as a list of tokenized words ex. ['วันนี้', 'อากาศ', 'ดี'] and return [('วันนี้', 'NCMN'), ('อากาศ', 'NCMN'), ('ดี', 'VATT')]
-	return
+# 	test = word_tokenize('วันนี้อากาศดี',engine='newmm')        # text = 'Today has a good weather' return type as list ['วันนี้', 'อากาศ', 'ดี']
+# 	POSlist = pos_tag(test,engine='old')			# pos_tag function input as a list of tokenized words ex. ['วันนี้', 'อากาศ', 'ดี'] and return [('วันนี้', 'NCMN'), ('อากาศ', 'NCMN'), ('ดี', 'VATT')]
+	
+	def peek(iterable):
+		try:
+			first = next(iterable)
+		except StopIteration:
+			return None
+		return True, chain([first], iterable)
+
+	for i in article['text'].split(' '):
+		seg = []
+		tokened = word_tokenize(i,engine='newmm')
+		for word in tokened:
+		    if(word not in thstopwords): seg.append(word)
+# 		pos_tag(cleanedWords,engine='old')
+		seg = peek(seg)
+		if seg is None:
+			continue
+		else:
+			boolean, seg = seg
+			yield seg
 
 def ja(article):
 	for line in article['text'].split('。'):
