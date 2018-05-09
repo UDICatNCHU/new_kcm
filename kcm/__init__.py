@@ -61,8 +61,14 @@ class KCM(object):
 								# But Mongo cannot use tuple or List as key
 								# so i just concatenate it with <cut> for the sake of convineint
 								# and split it after the insertion.
+
 								word1_and_partofspeech, word2_and_partofspeech = word_couple
 								word1_and_partofspeech, word2_and_partofspeech = '<cut>'.join(word1_and_partofspeech), '<cut>'.join(word2_and_partofspeech)
+
+								# bson.errors.InvalidDocument: key '.' must not contain '.'
+								# so replace . into ''
+								word1_and_partofspeech, word2_and_partofspeech = word1_and_partofspeech.replace('.', ''), word2_and_partofspeech.replace('.', '')								
+
 								table[word1_and_partofspeech][word2_and_partofspeech] = table[word1_and_partofspeech].setdefault(word2_and_partofspeech, 0) + 1
 								table[word2_and_partofspeech][word1_and_partofspeech] = table[word2_and_partofspeech].setdefault(word1_and_partofspeech, 0) + 1
 				Collect.insert(({'key':key, 'value':keyDict} for key, keyDict in table.items()))
