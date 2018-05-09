@@ -1,6 +1,8 @@
 # ja
 # MeCab has some bug
 # so i cannot put these import statement into ja function scope ...
+# TH: to install pythainlp for stopwords and segmentation, please install by the command line
+# pip install pythainlp
 import MeCab
 mecab = MeCab.Tagger("-Ochasen")
 
@@ -65,9 +67,12 @@ def th(article):
 	from pythainlp.tokenize import word_tokenize
 	from pythainlp.tag import pos_tag
 	thstopwords = stopwords.words('thai') # a list of Thai stopwords
-	test = word_tokenize('วันนี้อากาศดี',engine='newmm')        # text = 'Today has a good weather' return type as list ['วันนี้', 'อากาศ', 'ดี']
-	POSlist = pos_tag(test,engine='old')			# pos_tag function input as a list of tokenized words ex. ['วันนี้', 'อากาศ', 'ดี'] and return [('วันนี้', 'NCMN'), ('อากาศ', 'NCMN'), ('ดี', 'VATT')]
-	return
+
+	# TO-DO
+	# for line in article['text'] and split whatever to cut off article into sentences
+	# 	line = (i for i in word_tokenize(line,engine='newmm') if i not in thstopwords)
+	# 	POSlist = pos_tag(line,engine='old')
+	# 	yield POSlist
 
 def ja(article):
 	for line in article['text'].split('。'):
