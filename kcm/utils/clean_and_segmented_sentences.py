@@ -5,8 +5,8 @@ import os
 # so i cannot put these import statement into ja function scope ...
 # TH: to install pythainlp for stopwords and segmentation, please install by the command line
 # pip install pythainlp
-import MeCab
-mecab = MeCab.Tagger("-Ochasen")
+# import MeCab
+# mecab = MeCab.Tagger("-Ochasen")
 
 def clean_and_segmented_sentences(lang, article):
 	""" Do segmentation and removing stopwords for a wiki page
@@ -82,3 +82,13 @@ def ja(article):
 		line = line.strip()
 		if line:
 			yield ((i.split('\t')[0], None) for i in mecab.parse(line).split('\n')[:-2])
+
+if __name__ == '__main__':
+	# Change lang to the one you're testing now
+	lang = 'zh'
+
+	article = {
+		'text':'the context of a wiki page written in your language'
+	}
+	for i in clean_and_segmented_sentences(lang, article):
+		print(list(i))
