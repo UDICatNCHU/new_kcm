@@ -69,12 +69,15 @@ def th(article):
 	from pythainlp.tag import pos_tag
 	import string
 	punctuation = list(string.punctuation)
+	extraPunctions = ['。','/','(',')','.','ํ','|','๐','OO','o','ก','ข','ฃ','ค','ฅ','ฆ','ง','จ','ฉ','ช','ซ','ฌ','ญ','ฎ','ฏ','ฐ','ฑ','ฒ','ณ','ด','ต','ถ','ท','ธ','น','บ','ป','ผ','ฝ','พ','ฟ','ภ','ม','ย','ร','ล','ว','ศ','ษ','ส','ห','ฬ','อ','ฮ']
+	for e in extraPunctions:
+		punctuation.append(e)
 	thstopwords = stopwords.words('thai')
-	# for custom dictionary, please add the thai dictionary directory
+	# for custom stopwords list, please add the thai stopwords list directory below
 	# thstopwords = list(set(thstopwords + [i.strip() for i in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stopwords/th.txt'), 'r', encoding='UTF-8')]))
 	for line in article['text'].split('\n'): 
 		if line:
-			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords and punctuation]
+			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords and i not in punctuation]
 			if not line: 
 				continue
 			POSlist = pos_tag(line,engine='artagger')
