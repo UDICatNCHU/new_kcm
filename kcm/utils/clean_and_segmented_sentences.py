@@ -73,8 +73,6 @@ def th(article):
 	for e in extraPunctions:
 		punctuation.append(e)
 	thstopwords = stopwords.words('thai')
-	# for custom stopwords list, please add the thai stopwords list directory below
-	# thstopwords = list(set(thstopwords + [i.strip() for i in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stopwords/th.txt'), 'r', encoding='UTF-8')]))
 	for line in article['text'].split('\n'): 
 		if line:
 			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords and i not in punctuation]
