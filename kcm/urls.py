@@ -17,5 +17,6 @@ from django.conf.urls import url
 from kcm import views
 
 urlpatterns = [
-    url(r'^$', views.kcm, name='kcm'), 
+    url(r'^$', views.kcm, name='kcm'),
+    url(r'^search$', views.search, name='search'),
 ]

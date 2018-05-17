@@ -28,77 +28,124 @@ If you want to integrate `kcm` into your own django project, use manually instal
 
 1. add django app `kcm` in `settings.py`：
 
-  - add this:
+    - add this:
 
-    ```
-    INSTALLED_APPS=[
-    ...
-    ...
-    ...
-    'kcm',
-    ]
-    ```
+      ```
+      INSTALLED_APPS=[
+      ...
+      ...
+      ...
+      'kcm',
+      ]
+      ```
 
 2. add url patterns of kcm into `urls.py`：
 
-  - add this:
+    - add this:
 
-    ```
-    import kcm.urls
-    urlpatterns += [
-        url(r'^kcm/', include(kcm.urls))
-    ]
-    ```
+      ```
+      import kcm.urls
+      urlpatterns += [
+          url(r'^kcm/', include(kcm.urls))
+      ]
+      ```
 
 3. use `python3 manage.py buildKcm --lang <lang, e.g., zh or en or th> ` to build model of kcm.
 4. fire `python manage.py runserver` and go `127.0.0.1:8000/` to check whether the config is all ok.
 
 ## API
 
-1. the result of querying KCM model with keyword `周杰倫`(Captain America)：_`/kcm`_
-  - keyword
-  - num (default=10)
-  - keyFlag (default=[])
-  - valueFlag (defualt=[])
-  - example1：[http://udiclab.cs.nchu.edu.tw/kcm?keyword=周杰倫](http://udiclab.cs.nchu.edu.tw/kcm?keyword=周杰倫)
+1. Get correlated keywords：_`/kcm`_
+    - keyword
+    - num (default=10)
+    - keyFlag (default=[])
+    - valueFlag (defualt=[])
+    - example1：[http://udiclab.cs.nchu.edu.tw/kcm?keyword=周杰倫&lang=zh](http://udiclab.cs.nchu.edu.tw/kcm?keyword=周杰倫&lang=zh)
 
-      ```
-      {
-        "PartOfSpeech": ["nr"],
-        "similarity": 1.0,
-        "key": "周杰倫",
-        "value": [
-          ["巡迴演唱", "l", 861],
-          ["世界", "n", 705],
-          ["周杰倫", "nr", 424],
-          ["專輯", "n", 286],
-          ["歌曲", "n", 241],
-          ["時間", "n", 234]
+        ```
+        {
+          "PartOfSpeech": ["nr"],
+          "similarity": 1.0,
+          "key": "周杰倫",
+          "value": [
+            ["巡迴演唱", "l", 861],
+            ["世界", "n", 705],
+            ["周杰倫", "nr", 424],
+            ["專輯", "n", 286],
+            ["歌曲", "n", 241],
+            ["時間", "n", 234]
+          ]
+        }
+        ```
+
+    - example2 (with specific keyFlag and valueFlag)：[http://udiclab.cs.nchu.edu.tw/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr&lang=zh](http://udiclab.cs.nchu.edu.tw/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr&lang=zh)
+
+        ```
+        {
+          "PartOfSpeech": ["nr"],
+          "similarity": 1.0,
+          "key": "周杰倫",
+          "value": [
+            ["世界", "n", 705],
+            ["周杰倫", "nr", 424],
+            ["專輯", "n", 286],
+            ["歌曲", "n", 241],
+            ["時間", "n", 234],
+            ["深圳站", "n", 146],
+            ["演唱會", "n", 139],
+            ["成都站", "n", 132],
+            ["電影", "n", 119],
+            ["蔡依林", "nr", 111]
+          ]
+        }
+        ```
+2. Get similar keywords, not semantic similar but literally similar：_`/search`_
+    - keyword
+    - lang
+    - threshold (default=0)
+    - num (default=10)
+    - example1：[http://udiclab.cs.nchu.edu.tw/kcm/search?keyword=台灣高速鐵路&lang=zh](http://udiclab.cs.nchu.edu.tw/kcm/search?keyword=台灣高速鐵路&lang=zh)
+
+        ```
+        [
+          [
+            "臺灣高速鐵路",
+            0.45454545454545453
+          ],
+          [
+            "高速鐵路",
+            0.4
+          ],
+          [
+            "京廣高速鐵路",
+            0.3333333333333333
+          ]
+          ...
+          ...
+          ...
         ]
-      }
-      ```
+        ```
+    - example2：[http://udiclab.cs.nchu.edu.tw/kcm/search?keyword=台灣高速鐵路&lang=zh&threshold=0.2&num=15](http://udiclab.cs.nchu.edu.tw/kcm/search?keyword=台灣高速鐵路&lang=zh&threshold=0.2&num=15)
 
-  - example2 (with specific keyFlag and valueFlag)：[http://udiclab.cs.nchu.edu.tw/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr](http://udiclab.cs.nchu.edu.tw/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr)
-
-      ```
-      {
-        "PartOfSpeech": ["nr"],
-        "similarity": 1.0,
-        "key": "周杰倫",
-        "value": [
-          ["世界", "n", 705],
-          ["周杰倫", "nr", 424],
-          ["專輯", "n", 286],
-          ["歌曲", "n", 241],
-          ["時間", "n", 234],
-          ["深圳站", "n", 146],
-          ["演唱會", "n", 139],
-          ["成都站", "n", 132],
-          ["電影", "n", 119],
-          ["蔡依林", "nr", 111]
+        ```
+        [
+          [
+            "臺灣高速鐵路",
+            0.45454545454545453
+          ],
+          [
+            "高速鐵路",
+            0.4
+          ],
+          [
+            "京廣高速鐵路",
+            0.3333333333333333
+          ]
+          ...
+          ...
+          ...
         ]
-      }
-      ```
+        ```
 
 ## Break down into end to end tests
 

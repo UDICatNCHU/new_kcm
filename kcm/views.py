@@ -10,7 +10,15 @@ multilanguage_model = {
 
 @queryString_required(['lang', 'keyword'])
 def kcm(request):
-    keyword = request.GET['keyword']
-    lang = request.GET['lang']
-    result = multilanguage_model[lang].get(keyword=keyword, amount=int(request.GET['num']) if 'num' in request.GET else 10, keyFlag=request.GET['keyFlag'].split() if 'keyFlag' in request.GET else [], valueFlag=request.GET['valueFlag'].split() if 'valueFlag' in request.GET else [])
-    return JsonResponse(result, safe=False)
+	keyword = request.GET['keyword']
+	lang = request.GET['lang']
+	result = multilanguage_model[lang].get(keyword=keyword, amount=int(request.GET['num']) if 'num' in request.GET else 10, keyFlag=request.GET['keyFlag'].split() if 'keyFlag' in request.GET else [], valueFlag=request.GET['valueFlag'].split() if 'valueFlag' in request.GET else [])
+	return JsonResponse(result, safe=False)
+
+@queryString_required(['lang', 'keyword'])
+def search(request):
+	keyword = request.GET['keyword']
+	lang = request.GET['lang']
+	threshold = float(request.GET['threshold']) if 'threshold' in request.GET else 0
+	num = int(request.GET['num']) if 'num' in request.GET else 10
+	return JsonResponse(multilanguage_model[lang].kcmNgram.search(keyword, threshold=threshold)[:num], safe=False)
