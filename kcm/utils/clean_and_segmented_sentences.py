@@ -67,14 +67,17 @@ def th(article):
 	from pythainlp.corpus import stopwords
 	from pythainlp.tokenize import word_tokenize
 	from pythainlp.tag import pos_tag
-	thstopwords = stopwords.words('thai') + ['\n']# a list of Thai stopwords
-	thstopwords = list(set(thstopwords + [i.strip() for i in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stopwords/th.txt'), 'r', encoding='UTF-8')]))
-	for line in article['text'].split(' '): 
+	import string
+	punctuation = list(string.punctuation)
+	thstopwords = stopwords.words('thai')
+	# for custom dictionary, please add the thai dictionary directory
+	# thstopwords = list(set(thstopwords + [i.strip() for i in open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'stopwords/th.txt'), 'r', encoding='UTF-8')]))
+	for line in article['text'].split('\n'): 
 		if line:
-			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords]
+			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords and punctuation]
 			if not line: 
 				continue
-			POSlist = pos_tag(line,engine='old')
+			POSlist = pos_tag(line,engine='artagger')
 			yield POSlist
 
 def ja(article):
