@@ -172,6 +172,7 @@ class KCM(object):
 		self.Collect.drop()
 		logging.info('finish merging kcm')
 
+	@graceful_auto_reconnect
 	def get(self, keyword, amount=10, keyFlag=[], valueFlag=[]):
 		def valueFlagFind(result):
 			result['value'] = [i for i in result['value'] if i[1] in valueFlag or valueFlag == []]
