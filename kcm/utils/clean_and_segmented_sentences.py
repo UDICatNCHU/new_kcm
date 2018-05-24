@@ -78,7 +78,7 @@ def th(article):
 			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords and i not in punctuation]
 			if not line: 
 				continue
-			POSlist = pos_tag(line,engine='artagger')
+			POSlist = pos_tag(line,engine='old')  # engine='artagger'
 			yield POSlist
 
 def ja(article):
