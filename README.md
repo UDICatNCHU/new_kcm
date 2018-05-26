@@ -2,12 +2,6 @@
 
 KCM API are also available now：[API Online Version](https://github.com/UDICatNCHU/udic-nlp-API)  
 
-Now three languages are available：
-* Chinese
-* English (Comming soon)
-* Thai (Comming soon)
-* Japanese (Comming soon)
-
 ## Getting Started
 
 ### Prerequisities
@@ -30,7 +24,7 @@ If you want to integrate `kcm` into your own django project, use manually instal
 
     - add this:
 
-      ```
+      ```python
       INSTALLED_APPS=[
       ...
       ...
@@ -43,7 +37,7 @@ If you want to integrate `kcm` into your own django project, use manually instal
 
     - add this:
 
-      ```
+      ```python
       import kcm.urls
       urlpatterns += [
           url(r'^kcm/', include(kcm.urls))
@@ -62,7 +56,7 @@ If you want to integrate `kcm` into your own django project, use manually instal
     - valueFlag (defualt=[])
     - example1：[http://udiclab.cs.nchu.edu.tw/kcm?keyword=周杰倫&lang=zh](http://udiclab.cs.nchu.edu.tw/kcm?keyword=周杰倫&lang=zh)
 
-        ```
+        ```json
         {
           "PartOfSpeech": ["nr"],
           "similarity": 1.0,
@@ -80,7 +74,7 @@ If you want to integrate `kcm` into your own django project, use manually instal
 
     - example2 (with specific keyFlag and valueFlag)：[http://udiclab.cs.nchu.edu.tw/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr&lang=zh](http://udiclab.cs.nchu.edu.tw/kcm/?keyword=周杰倫&valueFlag=n+nr&keyFlag=nr&lang=zh)
 
-        ```
+        ```json
         {
           "PartOfSpeech": ["nr"],
           "similarity": 1.0,
@@ -106,7 +100,7 @@ If you want to integrate `kcm` into your own django project, use manually instal
     - num (default=10)
     - example1：[http://udiclab.cs.nchu.edu.tw/kcm/search?keyword=台灣高速鐵路&lang=zh](http://udiclab.cs.nchu.edu.tw/kcm/search?keyword=台灣高速鐵路&lang=zh)
 
-        ```
+        ```json
         [
           [
             "臺灣高速鐵路",
@@ -127,7 +121,7 @@ If you want to integrate `kcm` into your own django project, use manually instal
         ```
     - example2：[http://udiclab.cs.nchu.edu.tw/kcm/search?keyword=台灣高速鐵路&lang=zh&threshold=0.2&num=15](http://udiclab.cs.nchu.edu.tw/kcm/search?keyword=台灣高速鐵路&lang=zh&threshold=0.2&num=15)
 
-        ```
+        ```json
         [
           [
             "臺灣高速鐵路",
