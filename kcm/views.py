@@ -5,7 +5,8 @@ from kcm import KCM
 from udic_nlp_API.settings_database import uri
 
 multilanguage_model = {
-	'zh': KCM(lang='zh', uri=uri, ngram=True)
+	'zh': KCM(lang='zh', uri=uri, ngram=True),
+	'th': KCM(lang='th', uri=uri, ngram=True)
 }
 
 @queryString_required(['lang', 'keyword'])

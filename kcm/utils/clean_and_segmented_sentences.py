@@ -37,7 +37,7 @@ def clean_and_segmented_sentences(lang, article):
 		return ja(article)
 
 def zh(article):
-	# for zh 
+	# for zh
 	from udicOpenData.stopwords import rmsw
 	from opencc import OpenCC
 	from itertools import chain
@@ -73,10 +73,10 @@ def th(article):
 	for e in extraPunctions:
 		punctuation.append(e)
 	thstopwords = stopwords.words('thai')
-	for line in article['text'].split('\n'): 
+	for line in article['text'].split('\n'):
 		if line:
-			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords and i not in punctuation]
-			if not line: 
+			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords and i not in punctuation and not i.startswith('$')]
+			if not line:
 				continue
 			POSlist = pos_tag(line,engine='old')
 			result = []
@@ -102,3 +102,4 @@ if __name__ == '__main__':
 	}
 	for i in clean_and_segmented_sentences(lang, article):
 		print(list(i))
+
