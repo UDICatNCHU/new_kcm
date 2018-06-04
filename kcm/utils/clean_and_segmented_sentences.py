@@ -69,7 +69,7 @@ def th(article):
 	from pythainlp.tag import pos_tag
 	import string
 	punctuation = list(string.punctuation)
-	extraPunctions = ['。','/','(',')','.','ํ','|','๐','OO','o','ก','ข','ฃ','ค','ฅ','ฆ','ง','จ','ฉ','ช','ซ','ฌ','ญ','ฎ','ฏ','ฐ','ฑ','ฒ','ณ','ด','ต','ถ','ท','ธ','น','บ','ป','ผ','ฝ','พ','ฟ','ภ','ม','ย','ร','ล','ว','ศ','ษ','ส','ห','ฬ','อ','ฮ']
+	extraPunctions = ['$', '。','/','(',')','.','ํ','|','๐','OO','o','ก','ข','ฃ','ค','ฅ','ฆ','ง','จ','ฉ','ช','ซ','ฌ','ญ','ฎ','ฏ','ฐ','ฑ','ฒ','ณ','ด','ต','ถ','ท','ธ','น','บ','ป','ผ','ฝ','พ','ฟ','ภ','ม','ย','ร','ล','ว','ศ','ษ','ส','ห','ฬ','อ','ฮ']
 	for e in extraPunctions:
 		punctuation.append(e)
 	thstopwords = stopwords.words('thai')
@@ -78,8 +78,14 @@ def th(article):
 			line = [i for i in word_tokenize(line,engine='newmm') if i not in thstopwords and i not in punctuation]
 			if not line: 
 				continue
-			POSlist = pos_tag(line,engine='old')  # engine='artagger'
-			yield POSlist
+			POSlist = pos_tag(line,engine='old')
+			result = []
+			for keyword, pos in POSlist:
+				if pos == None:
+					result.append((keyword, 'None'))
+				else:
+					result.append((keyword, pos))
+			yield result
 
 def ja(article):
 	for line in article['text'].split('。'):

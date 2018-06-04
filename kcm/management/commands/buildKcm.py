@@ -10,6 +10,7 @@ class Command(BaseCommand):
 	def add_arguments(self, parser):
 		# Positional arguments
 		parser.add_argument('--lang', type=str)
+		parser.add_argument('--cpus', type=int, default=20)
 	
 	def handle(self, *args, **options):
 		def getWikiData():
@@ -30,7 +31,7 @@ class Command(BaseCommand):
 
 		wiki_dir_name, wiki_json_dir, lang = getWikiData()
 		self.stdout.write(self.style.SUCCESS('finish the extraction of Wikipedia'))
-		k = KCM(input_dir=wiki_json_dir, lang=options['lang'], uri=uri)
+		k = KCM(input_dir=wiki_json_dir, lang=options['lang'], uri=uri, cpus=int(options['cpus']))
 		k.build()
 		self.stdout.write(self.style.SUCCESS('finish build material of KCM'))
 		k.merge()

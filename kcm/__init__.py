@@ -13,7 +13,7 @@ logging.basicConfig(format='%(levelname)s : %(asctime)s : %(message)s', filename
 
 
 class KCM(object):
-	def __init__(self, input_dir='wikijson', lang='zh', uri=None):
+	def __init__(self, input_dir='wikijson', lang='zh', uri=None, ngram=False, cpus=20):
 		self.input_dir = input_dir
 		self.lang = lang
 		self.uri = uri
@@ -23,11 +23,12 @@ class KCM(object):
 		self.fs = gridfs.GridFS(self.db)
 
 		# prevent it from taking up all the cpus and make MongoDB dead.
-		self.cpus = math.ceil(mp.cpu_count() * 0.7)
-		self.mergeCpus = math.ceil(mp.cpu_count() * 0.1)
+		self.cpus = cpus
+		self.mergeCpus = math.ceil(cpus / 7)
 
 		# use ngram for searching
-		self.kcmNgram = NGram((i['key'] for i in self.KCMCollect.find({}, {'key':1, '_id':False})))
+		if ngram:
+			self.kcmNgram = NGram((i['key'] for i in self.KCMCollect.find({}, {'key':1, '_id':False})))
 
 	def build(self):
 		# graceful_auto_reconnect is used to handle Mongo Connection issue.
