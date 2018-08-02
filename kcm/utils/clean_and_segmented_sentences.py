@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 import os
+from itertools import chain
 # ja
 # MeCab has some bug
 # so i cannot put these import statement into ja function scope ...
 # TH: to install pythainlp for stopwords and segmentation, please install by the command line
 # pip install pythainlp
 # import MeCab
-# mecab = MeCab.Tagger("-Ochasen")
+# mecab = MeCab.Tagger("-Ochasen")		
 
 def clean_and_segmented_sentences(lang, article):
 	""" Do segmentation and removing stopwords for a wiki page
@@ -32,23 +33,22 @@ def clean_and_segmented_sentences(lang, article):
 	elif lang == 'th':
 		return th(article)
 	elif lang == 'en':
-		pass
+		return en(article)
 	elif lang == 'ja':
 		return ja(article)
+
+def peek(iterable):
+	try:
+		first = next(iterable)
+	except StopIteration:
+		return None
+	return chain([first], iterable)
 
 def zh(article):
 	# for zh
 	from udicOpenData.stopwords import rmsw
 	from opencc import OpenCC
-	from itertools import chain
 	openCC = OpenCC('s2t')
-
-	def peek(iterable):
-		try:
-			first = next(iterable)
-		except StopIteration:
-			return None
-		return True, chain([first], iterable)
 
 	for i in article['text'].split('。'):
 		seg = rmsw(openCC.convert(i), flag=True)
@@ -56,7 +56,6 @@ def zh(article):
 		if seg is None:
 			continue
 		else:
-			boolean, seg = seg
 			yield seg
 
 def th(article):
@@ -92,6 +91,16 @@ def ja(article):
 		line = line.strip()
 		if line:
 			yield ((i.split('\t')[0], None) for i in mecab.parse(line).split('\n')[:-2])
+
+def en(article):
+	from udicOpenData.stopwords import rmsw_en
+	for i in article['text'].split('.'):
+		seg = rmsw_en(i, flag=True)
+		seg = peek(seg)
+		if seg is None:
+			continue
+		else:
+			yield seg
 
 if __name__ == '__main__':
 	# Change lang to the one you're testing now
