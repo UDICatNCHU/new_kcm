@@ -6,6 +6,7 @@ import math
 import multiprocessing as mp
 import os
 import sys
+import pickle
 from collections import defaultdict
 from itertools import chain, combinations
 
@@ -15,12 +16,13 @@ import gridfs
 import json_lines
 import pymongo
 from kcm.utils.clean_and_segmented_sentences import \
-    clean_and_segmented_sentences
+	clean_and_segmented_sentences
 from kcm.utils.graceful_auto_reconnect import graceful_auto_reconnect
 from pymongo import MongoClient
 from pympler.asizeof import asizeof
 
-logging.basicConfig(format='%(levelname)s : %(asctime)s : %(message)s', filename='buildKCM.log', level=logging.INFO)
+logging.basicConfig(format='%(levelname)s : %(asctime)s : %(message)s',\
+ filename='buildKCM.log', level=logging.INFO)
 
 class KCM(object):
 	def __init__(self, input_dir='wikijson', lang='zh', uri=None, ngram=False, cpus=20):
@@ -38,9 +40,10 @@ class KCM(object):
 
 		# use ngram for searching
 		if ngram:
-			self.kcmNgram = NGram(
-				(i['key'] for i in self.KCMCollect.find({}, {'key':1, '_id':False}).batch_size(1000))
-			)
+			try:
+				self.kcmNgram = pickle.load(open('kcmNgram.{}.pkl'.format(self.lang), 'rb'))
+			except FileNotFoundError as e:
+				print(str(e)+', if this happened in building steps, then ignore it!')
 
 	def build(self):
 		# graceful_auto_reconnect is used to handle Mongo Connection issue.
@@ -80,7 +83,7 @@ class KCM(object):
 
 								# bson.errors.InvalidDocument: key '.' must not contain '.'
 								# so replace . into ''
-								word1_and_partofspeech, word2_and_partofspeech = word1_and_partofspeech.replace('.', ''), word2_and_partofspeech.replace('.', '')								
+								word1_and_partofspeech, word2_and_partofspeech = word1_and_partofspeech.replace('.', ''), word2_and_partofspeech.replace('.', '')                               
 
 								table[word1_and_partofspeech][word2_and_partofspeech] = table[word1_and_partofspeech].setdefault(word2_and_partofspeech, 0) + 1
 								table[word2_and_partofspeech][word1_and_partofspeech] = table[word2_and_partofspeech].setdefault(word1_and_partofspeech, 0) + 1
@@ -114,7 +117,10 @@ class KCM(object):
 
 	def merge(self):
 		logging.info('start merging kcm')
-		wordSet = list({keywordDict['key'] for keywordDict in self.Collect.find({}, {'_id':False})}.batch_size(1000))
+		wordSet = list({keywordDict['key'] for keywordDict in self.Collect.find({}, {'_id':False}).batch_size(1000)})
+		# turn all kcm words into ngram format and dump
+		pickle.dump(NGram(wordSet), open('kcmNgram.{}.pkl'.format(self.lang), 'wb'))
+
 		amount = math.ceil(len(wordSet)/self.mergeCpus)
 		wordSet = [wordSet[i:i + amount] for i in range(0, len(wordSet), amount)]
 
@@ -190,7 +196,7 @@ class KCM(object):
 		def valueFlagFind(result):
 			result['value'] = [i for i in result['value'] if i[1] in valueFlag or valueFlag == []]
 			result['value'].sort(key=lambda x:x[2], reverse=True)
-			result['value'] = result['value'][:amount]		
+			result['value'] = result['value'][:amount]      
 			return result
 		def keyFlagFind(OriginKeyword):
 			NgramKeyword = self.kcmNgram.find(OriginKeyword) if self.kcmNgram.find(OriginKeyword) else None

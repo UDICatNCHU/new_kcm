@@ -1,17 +1,17 @@
 from distutils.core import setup
 
 setup(
-    name = 'kcm',
-    packages = ['kcm'],
+    name='kcm',
+    packages=['kcm'],
     package_data={'kcm':['management/commands/*', 'utils/*']},
-    version = '1.9',
-    description = 'kcm class file',
-    author = 'davidtnfsh',
-    author_email = 'davidtnfsh@gmail.com',
-    url = 'https://github.com/udicatnchu/kcm',
-    download_url = 'https://github.com/udicatnchu/kcm/archive/v1.9.tar.gz',
-    keywords = ['kcm'],
-    classifiers = [],
+    version='2.0',
+    description='kcm class file',
+    author='davidtnfsh',
+    author_email='davidtnfsh@gmail.com',
+    url='https://github.com/udicatnchu/kcm',
+    download_url='https://github.com/udicatnchu/kcm/archive/v2.0.tar.gz',
+    keywords=['kcm'],
+    classifiers=[],
     license='GPL3.0',
     install_requires=[
         'simplejson',
