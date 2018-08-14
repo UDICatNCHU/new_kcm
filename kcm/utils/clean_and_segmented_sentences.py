@@ -53,9 +53,7 @@ def zh(article):
 	for i in article['text'].split('。'):
 		seg = rmsw(openCC.convert(i), flag=True)
 		seg = peek(seg)
-		if seg is None:
-			continue
-		else:
+		if seg:
 			yield seg
 
 def th(article):
@@ -90,16 +88,14 @@ def ja(article):
 	for line in article['text'].split('。'):
 		line = line.strip()
 		if line:
-			yield ((i.split('\t')[0], None) for i in mecab.parse(line).split('\n')[:-2])
+			yield (i.split('\t')[2:4] for i in mecab.parse(line).split('\n')[:-2])
 
 def en(article):
 	from udicOpenData.stopwords import rmsw_en
 	for i in article['text'].split('.'):
 		seg = rmsw_en(i, flag=True)
 		seg = peek(seg)
-		if seg is None:
-			continue
-		else:
+		if seg:
 			yield seg
 
 if __name__ == '__main__':

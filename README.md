@@ -6,7 +6,8 @@ KCM API are also available now：[API Online Version](https://github.com/UDICatN
 
 ### Prerequisities
 
-* If you want to use `the English version of KCM`， please download nltk data：`python3 -m nltk.downloader -d /usr/local/share/nltk_data all`
+* en: If you want to use `the English version of KCM`， please download nltk data：`python3 -m nltk.downloader -d /usr/local/share/nltk_data all`
+* ja: `brew install mecab mecab-ipadic`
 
 ## Install
 
